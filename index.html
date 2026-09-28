@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#f4efe6" />
+<title>BREWLAB — Manual Coffee Extraction</title>
+<style>
+
+:root{
+  --bg:#dff3f4;
+  --shell:#ffffff;
+  --sidebar:#1f9f9a;
+  --sidebar-deep:#187f7b;
+  --sidebar-soft:rgba(255,255,255,.14);
+  --paper:#ffffff;
+  --card:#ffffff;
+  --ink:#171a36;
+  --muted:#7e8395;
+  --line:#edf0f2;
+  --brown:#74472d;
+  --brown-dark:#4d2b1d;
+  --teal:#20a39e;
+  --teal-soft:#e8f8f7;
+  --yellow:#f7d967;
+  --danger:#b85f52;
+  --shadow:0 22px 70px rgba(36,120,124,.17);
+  --card-shadow:0 8px 24px rgba(28,49,61,.055);
+  --radius:22px;
+  --tap:48px;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  margin:0;
+  color:var(--ink);
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at 12% 80%,rgba(255,255,255,.75) 0 4px,transparent 5px),
+    linear-gradient(180deg,#d9f1f4 0%,#e7f7f7 100%);
+  min-height:100vh;
+  padding:5.5vh 5vw;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{
+  min-height:89vh;
+  max-width:1520px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:250px minmax(0,1fr);
+  background:var(--shell);
+  border-radius:30px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  border:1px solid rgba(26,145,141,.22);
+}
+.sidebar{
+  position:relative;
+  height:auto;
+  min-height:89vh;
+  padding:26px 18px;
+  background:linear-gradient(180deg,#27a7a2 0%,#229995 100%);
+  border-right:0;
+  color:white;
+  overflow:hidden;
+}
+.sidebar:after{
+  content:"";
+  position:absolute;
+  left:-60px;
+  bottom:-80px;
+  width:260px;
+  height:260px;
+  border-radius:50%;
+  border:34px solid rgba(255,255,255,.08);
+}
+.brand{
+  position:relative;
+  z-index:1;
+  font-weight:900;
+  letter-spacing:.02em;
+  font-size:18px;
+  margin:5px 10px 28px;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.brand:before{
+  content:"☕";
+  display:grid;
+  place-items:center;
+  width:34px;height:34px;
+  border:1px solid rgba(255,255,255,.4);
+  border-radius:12px;
+  background:rgba(255,255,255,.1);
+}
+.brand small{
+  display:block;
+  font-weight:600;
+  letter-spacing:.03em;
+  color:rgba(255,255,255,.72);
+  font-size:9px;
+  margin-top:2px;
+}
+.nav{display:grid;gap:7px;position:relative;z-index:1}
+.nav button{
+  min-height:45px;
+  border:0;
+  background:transparent;
+  text-align:left;
+  padding:0 14px;
+  border-radius:13px;
+  color:rgba(255,255,255,.86);
+  font-size:13px;
+  font-weight:650;
+  transition:.18s ease;
+}
+.nav button:before{
+  content:"○";
+  display:inline-block;
+  width:24px;
+  font-size:13px;
+  opacity:.9;
+}
+.nav button:hover{background:rgba(255,255,255,.08);transform:translateX(2px)}
+.nav button.active{
+  background:#fff;
+  box-shadow:0 8px 22px rgba(18,103,101,.18);
+  color:#233041;
+  font-weight:800;
+}
+.sidebar-decoration{
+  position:absolute;
+  left:24px;right:24px;bottom:24px;
+  z-index:1;
+  padding:18px;
+  border-radius:20px;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.14);
+}
+.sidebar-decoration .cup{font-size:42px;margin-bottom:8px}
+.sidebar-decoration b{font-size:15px}
+.sidebar-decoration p{color:rgba(255,255,255,.74);font-size:11px;margin:6px 0 12px}
+.main{
+  padding:0 36px 34px;
+  width:100%;
+  max-width:none;
+  margin:0;
+  background:#fff;
+  overflow:hidden;
+}
+.app-header{
+  min-height:78px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  border-bottom:1px solid var(--line);
+}
+.search-wrap{flex:1;position:relative;max-width:650px}
+.search-wrap:before{
+  content:"⌕";
+  position:absolute;
+  left:16px;top:50%;transform:translateY(-50%);
+  color:#505467;font-size:21px;pointer-events:none;
+}
+.search-wrap input{
+  background:#f6f7f7;
+  border:0;
+  min-height:44px;
+  border-radius:22px;
+  padding:0 18px 0 44px;
+  color:var(--ink);
+}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.header-icon{
+  width:38px;height:38px;border:0;border-radius:50%;
+  background:#f7f8f7;color:#34384c;font-size:17px
+}
+.user-chip{display:flex;align-items:center;gap:9px}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#daf0ea;font-weight:900;color:#216c68}
+.user-copy{line-height:1.15}
+.user-copy b{font-size:12px}
+.user-copy small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:24px 0 18px;
+}
+.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-size:10px;font-weight:800}
+h1{font-size:clamp(32px,3.3vw,48px);line-height:1;margin:3px 0 6px;letter-spacing:-.04em;font-family:Georgia,"Times New Roman",serif}
+h2{font-size:22px;letter-spacing:-.025em;margin:0 0 14px}
+h3{font-size:16px;margin:0 0 9px}
+p{color:#656b7b;line-height:1.5}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{
+  background:var(--card);
+  border:1px solid #edf0f1;
+  border-radius:18px;
+  padding:18px;
+  box-shadow:var(--card-shadow);
+}
+.hero{
+  background:linear-gradient(135deg,#fff 0%,#fbf6ee 100%);
+  color:var(--ink);
+  padding:22px;
+  border:1px solid #f0ece8;
+  border-radius:20px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--card-shadow);
+}
+.hero:after{
+  content:"";
+  position:absolute;width:210px;height:210px;border-radius:50%;
+  right:-65px;top:-85px;background:#eef8f6;border:0;
+}
+.hero p{color:#727789}
+.hero .metric{font-size:44px;font-weight:900;letter-spacing:-.05em}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.space{justify-content:space-between}
+.btn{
+  min-height:var(--tap);
+  border:0;border-radius:14px;padding:0 18px;
+  font-weight:850;letter-spacing:.005em;
+  transition:.16s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:var(--teal);color:#fff;box-shadow:0 8px 18px rgba(32,163,158,.22)}
+.btn.dark{background:var(--brown-dark);color:#fff}
+.btn.ghost{background:#eff6f5;color:#267b77}
+.btn.line{background:#fff;border:1px solid #dde5e6;color:#4e5768}
+.btn.small{min-height:36px;padding:0 12px;font-size:12px;border-radius:11px}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 10px;
+  background:#f7f8f7;border-radius:999px;color:#62697c;font-size:11px;font-weight:750
+}
+label{display:grid;gap:6px;font-size:11px;color:var(--muted);font-weight:750}
+input,select,textarea{
+  width:100%;background:#fff;border:1px solid #e4e8ea;border-radius:12px;
+  padding:11px 12px;color:var(--ink);outline:none
+}
+input:focus,select:focus,textarea:focus{border-color:#4bb8b4;box-shadow:0 0 0 3px rgba(32,163,158,.1)}
+.fieldgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.bigval{font-size:32px;font-weight:900;letter-spacing:-.04em}
+.muted{color:var(--muted)}
+.stat{padding:12px 0;border-top:1px dashed #e7eaeb}
+.view{display:none}.view.active{display:block}
+.bean-card{display:grid;gap:9px}
+.bean-title{font-size:19px;font-weight:900}
+.status.ready{color:#218b75}.status.fresh{color:#b68528}.status.old{color:var(--danger)}
+.notice{padding:13px 15px;background:#f5f8f7;border-radius:12px;font-size:12px;color:#5f6778}
+.next-change{border-left:4px solid var(--teal);padding-left:14px}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid #edf0f2}
+.table th{color:#8b90a0;font-size:9px;text-transform:uppercase;letter-spacing:.08em;background:#fafbfb}
+.stars{color:#e0a12b;letter-spacing:.1em}
+.timer-wrap{text-align:center;padding:24px}
+.timer{font-variant-numeric:tabular-nums;font-size:clamp(72px,11vw,138px);font-weight:950;line-height:.9;letter-spacing:-.07em;color:#172038}
+.stage-name{font-size:20px;font-weight:900;margin-top:16px}
+.target{font-size:32px;font-weight:900}
+.stage{display:grid;grid-template-columns:80px 1fr 90px;align-items:center;gap:10px;padding:10px;background:#f5f8f8;border-radius:12px}
+.stage.active{outline:2px solid var(--teal);background:#fff}
+.taste-grid{display:flex;flex-wrap:wrap;gap:7px}
+.taste{border:1px solid #e2e7e8;background:#fff;padding:9px 11px;border-radius:999px;color:#555d6f}
+.taste.selected{background:var(--teal);color:#fff;border-color:var(--teal)}
+.canvasbox{height:260px;background:#f8faf9;border-radius:14px;position:relative;overflow:hidden}
+.map-axis{position:absolute;background:#dce5e5}.map-axis.h{height:1px;width:100%;left:0;top:50%}.map-axis.v{width:1px;height:100%;top:0;left:50%}
+.dot{width:18px;height:18px;border-radius:50%;background:var(--teal);position:absolute;transform:translate(-50%,-50%);box-shadow:0 0 0 6px rgba(32,163,158,.14)}
+.axislabel{position:absolute;font-size:10px;color:var(--muted)}
+.axislabel.left{left:10px;top:46%}.axislabel.right{right:10px;top:46%}.axislabel.top{top:10px;left:52%}.axislabel.bottom{bottom:10px;left:52%}
+.compare{display:grid;grid-template-columns:1fr 42px 1fr;gap:14px;align-items:start}
+.vs{align-self:center;text-align:center;font-weight:900;color:var(--muted)}
+.diff{background:#e7f7f5;border-radius:8px;padding:4px 7px}
+details{border-top:1px solid #edf0f2;padding-top:12px;margin-top:12px}
+summary{cursor:pointer;font-weight:850}
+#pressureChart,#radarChart{width:100%;height:240px;background:#f8faf9;border-radius:14px}
+.bottom-nav{display:none}
+.toast{position:fixed;right:18px;bottom:18px;background:#1a2540;color:#fff;padding:11px 15px;border-radius:12px;opacity:0;transform:translateY(10px);transition:.2s;z-index:50}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* Dashboard-specific blocks */
+.dashboard-topline{
+  display:flex;align-items:center;gap:12px;padding:10px 12px;
+  background:linear-gradient(90deg,#fbf8f3,#f7f7f4);
+  border-radius:16px;margin-bottom:14px;border:1px solid #f0efeb
+}
+.dashboard-topline label{display:flex;align-items:center;gap:8px;min-width:0}
+.dashboard-topline select{border:0;background:#fff;min-width:190px;border-radius:12px}
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(300px,.9fr);
+  gap:14px;
+}
+.chart-card{min-height:255px}
+.chart-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.chart-bars{
+  height:170px;
+  display:flex;align-items:flex-end;gap:18px;
+  padding:28px 10px 22px;
+  position:relative;
+}
+.chart-bars:before,.chart-bars:after{
+  content:"";position:absolute;left:0;right:0;border-top:1px solid #eef0f0
+}
+.chart-bars:before{top:55px}.chart-bars:after{top:110px}
+.chart-bar-wrap{flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;position:relative}
+.chart-bar{
+  width:24px;min-height:24px;border-radius:7px 7px 2px 2px;
+  background:#dff2f4;position:relative;z-index:1
+}
+.chart-bar.hot{background:#f7db68}
+.chart-bar:after{
+  content:"";position:absolute;width:7px;height:7px;border-radius:50%;
+  background:#73503c;left:50%;transform:translateX(-50%);top:-7px
+}
+.chart-label{position:absolute;bottom:-20px;font-size:9px;color:#9297a5}
+.bean-spotlight{
+  background:linear-gradient(135deg,#fffdf8 0%,#fbf4e8 65%,#edf9f6 100%);
+  position:relative;overflow:hidden
+}
+.bean-spotlight:after{
+  content:"☕";position:absolute;right:12px;top:50px;font-size:78px;opacity:.11;transform:rotate(-12deg)
+}
+.bean-spotlight h2{font-family:Georgia,"Times New Roman",serif;font-size:27px;margin:6px 0}
+.bean-tags{display:flex;gap:6px;flex-wrap:wrap}
+.bean-tags span{font-size:9px;padding:6px 9px;background:#f7e9d6;border-radius:999px;color:#775b43}
+.recipe-next-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.9fr);gap:14px;margin-top:14px}
+.recipe-card-inner{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center}
+.recipe-thumb{
+  width:110px;height:110px;border-radius:16px;
+  background:
+   radial-gradient(circle at 50% 25%,#f6db9d 0 10%,transparent 11%),
+   linear-gradient(145deg,#8d5d39,#2f2118);
+  display:grid;place-items:center;color:#fff;font-size:42px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)
+}
+.recipe-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.metric-chip small{display:block;color:#9a9eaa;font-size:8px;margin-bottom:3px}.metric-chip b{font-size:11px}
+.next-card{background:linear-gradient(135deg,#edfafa 0%,#dff6f4 100%);border-color:#d9f1ef}
+.next-card .next-box{background:rgba(255,255,255,.85);padding:12px;border-radius:13px;margin:12px 0}
+.recent-panel{margin-top:14px}
+.section-link{font-size:10px;color:#138f8a;font-weight:850}
+.topbar .subtitle{margin:0;color:#858b99;font-size:14px}
+@media(max-width:1120px){
+  body{padding:2.5vh 2vw}
+  .app{grid-template-columns:215px 1fr;min-height:95vh}
+  .sidebar{min-height:95vh}
+  .main{padding:0 22px 28px}
+  .dashboard-grid,.recipe-next-grid{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  body{padding:0;background:#fff}
+  .app{display:block;min-height:100vh;border-radius:0;border:0;box-shadow:none}
+  .sidebar{display:none}
+  .main{padding:0 14px 90px}
+  .app-header{min-height:64px;position:sticky;top:0;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);z-index:15}
+  .user-copy{display:none}
+  .search-wrap input{font-size:12px}
+  .g2,.g3,.fieldgrid,.dashboard-grid,.recipe-next-grid{grid-template-columns:1fr}
+  .topbar{margin:18px 0 14px}
+  .topbar .row{display:none}
+  .card{padding:15px;border-radius:16px}
+  .dashboard-topline{display:grid}
+  .dashboard-topline label{display:grid}
+  .dashboard-topline select{min-width:0;width:100%}
+  .recipe-card-inner{grid-template-columns:80px 1fr}
+  .recipe-thumb{width:80px;height:80px}
+  .recipe-metrics{grid-template-columns:1fr 1fr}
+  .chart-bars{gap:8px}
+  .chart-bar{width:18px}
+  .bottom-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;
+    background:rgba(255,255,255,.95);backdrop-filter:blur(16px);
+    border-top:1px solid var(--line);padding:7px 8px calc(7px + env(safe-area-inset-bottom))
+  }
+  .bottom-nav button{flex:1;border:0;background:transparent;padding:8px 4px;font-size:9px;color:#747a8a}
+  .bottom-nav button.active{color:var(--teal);font-weight:900}
+  .compare{grid-template-columns:1fr}.vs{padding:0}
+  .timer{font-size:23vw}.stage{grid-template-columns:64px 1fr 72px}
+  .sidebar-decoration{display:none}
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><span>BREWLAB<small>BETTER COFFEE, DAILY</small></span></div>
+  <nav class="nav" id="sideNav"></nav>
+  <div class="sidebar-decoration">
+    <div class="cup">☕</div>
+    <b>Good coffee starts here.</b>
+    <p>Save your brew, learn from it, and make the next cup better.</p>
+    <button class="btn small" style="background:#f7d967;color:#34404f" onclick="showView('brew')">Start brewing</button>
+  </div>
+</aside>
+<main class="main">
+  <div class="app-header">
+    <div class="search-wrap"><input id="globalSearch" placeholder="Search beans, recipes, or your brews..." oninput="globalSearchHandler(this.value)"/></div>
+    <div class="header-actions">
+      <button class="header-icon" title="Theme">☼</button>
+      <button class="header-icon" title="Notifications">◌</button>
+      <div class="user-chip"><div class="avatar">B</div><div class="user-copy"><b>Brew Explorer</b><small>Local coffee lab</small></div></div>
+    </div>
+  </div>
+  <div class="topbar">
+    <div><div class="eyebrow" id="sectionEyebrow">Personal coffee lab</div><h1 id="sectionTitle">Brew Now</h1><p class="subtitle" id="sectionSubtitle">Track, improve, and enjoy better coffee.</p></div>
+    <div class="row"><span class="pill" id="modePill">BASIC</span><button class="btn small ghost" onclick="toggleAdvanced()">Advanced</button><button class="btn dark" onclick="showView('brew')">☕ Start Brew</button></div>
+  </div>
+
+  <section id="home" class="view active">
+    <div class="dashboard-topline">
+      <label><span>Current Bean</span><select id="quickBean"></select></label>
+      <label><span>Brewer</span><select id="quickBrewer"></select></label>
+      <label><span>Grinder</span><select id="quickGrinder"></select></label>
+      <button class="btn primary" onclick="prepareBrew()">Get Starting Recipe</button>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div><div class="eyebrow">RECENT BREWS</div><h2 style="margin:4px 0 2px">Extraction trend</h2><p style="margin:0;font-size:11px">Your last seven brews at a glance</p></div>
+          <div class="row"><span class="pill">7D</span><span class="pill">30D</span><span class="pill">ALL</span></div>
+        </div>
+        <div id="dashboardChart" class="chart-bars"></div>
+      </div>
+      <div class="card bean-spotlight" id="homeSummary"></div>
+    </div>
+
+    <div class="recipe-next-grid">
+      <div class="card" id="bestRecipeCard"></div>
+      <div class="card next-card" id="nextBrewCard"></div>
+    </div>
+
+    <div class="card recent-panel">
+      <div class="row space"><div><div class="eyebrow">RECENT BREWS</div><h2 style="margin:4px 0 0">Brew history</h2></div><button class="btn small line" onclick="showView('logs')">View all brews →</button></div>
+      <div style="overflow:auto;margin-top:10px"><table class="table"><thead><tr><th>Date</th><th>Bean</th><th>Recipe</th><th>Grind</th><th>Water Temp</th><th>Ratio</th><th>Rating</th><th>Notes</th></tr></thead><tbody id="dashboardLogBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="brew" class="view">
+    <div class="grid g2">
+      <div class="card">
+        <h2>Starting recipe</h2>
+        <div class="fieldgrid">
+          <label>Bean<select id="brewBean"></select></label>
+          <label>Brewer<select id="brewBrewer"></select></label>
+          <label>Grinder<select id="brewGrinder"></select></label>
+          <label>Grind<input id="brewGrind" /></label>
+          <label>Dose (g)<input id="brewDose" type="number" step=".1" value="15"/></label>
+          <label>Ratio<select id="brewRatio"><option>14</option><option>15</option><option>15.5</option><option selected>16</option><option>16.5</option><option>17</option></select></label>
+          <label>Water (g)<input id="brewWater" type="number" step="1"/></label>
+          <label>Temperature °C<input id="brewTemp" type="number" step="1"/></label>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn primary" onclick="recommendFilter()">Recommend</button>
+          <button class="btn ghost" onclick="recalcWater()">Recalculate</button>
+          <button class="btn line" onclick="saveRecipeFromBrew()">Save recipe</button>
+        </div>
+        <div id="recommendWhy" class="notice" style="margin-top:14px"></div>
+        <details><summary>Water & advanced variables</summary>
+          <div class="fieldgrid" style="margin-top:12px">
+            <label>Water source<input id="waterSource" placeholder="Filtered / TWW / custom"/></label>
+            <label>TDS ppm<input id="waterTds" type="number" value="80"/></label>
+            <label>GH<input id="waterGh" type="number" value="60"/></label>
+            <label>KH<input id="waterKh" type="number" value="35"/></label>
+            <label>Bloom ratio<input id="bloomRatio" type="number" value="3"/></label>
+            <label>Pour height<select><option>Low</option><option>Medium</option><option>High</option></select></label>
+            <label>Agitation<select><option>Low</option><option selected>Medium</option><option>High</option></select></label>
+            <label>Filter paper<input placeholder="Abaca / Cafec / OEM"/></label>
+          </div>
+        </details>
+      </div>
+      <div class="card">
+        <div class="row space"><h2>Pour structure</h2><button class="btn small ghost" onclick="addStage()">+ Stage</button></div>
+        <div id="stageEditor"></div>
+        <div class="notice" id="flowRateInfo" style="margin-top:12px"></div>
+      </div>
+    </div>
+    <div class="card timer-wrap" style="margin-top:16px">
+      <div class="eyebrow">BREW COACH</div>
+      <div class="timer" id="brewTimer">00:00</div>
+      <div class="stage-name" id="stageName">Ready</div>
+      <div class="target" id="stageTarget">Target — g</div>
+      <p id="nextAction">Press start when ready.</p>
+      <div class="row" style="justify-content:center;margin-top:20px">
+        <button class="btn dark" onclick="timerStart('filter')">START</button>
+        <button class="btn ghost" onclick="timerPause()">PAUSE</button>
+        <button class="btn line" onclick="timerReset()">RESET</button>
+        <button class="btn primary" onclick="finishBrew()">FINISH & RATE</button>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card">
+        <h2>How did it taste?</h2>
+        <div class="taste-grid" id="tasteGrid"></div>
+        <div class="fieldgrid" style="margin-top:14px">
+          <label>Intensity<select id="tasteIntensity"><option>Low</option><option selected>Medium</option><option>High</option></select></label>
+          <label>Rating<select id="brewRating"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option></select></label>
+          <label>Actual brew time<input id="actualTime" placeholder="2:35"/></label>
+          <label>Notes<input id="brewNotes" placeholder="Floral after cooling…"/></label>
+        </div>
+        <div class="row" style="margin-top:14px"><button class="btn primary" onclick="diagnoseFilter()">Get next-brew adjustment</button><button class="btn ghost" onclick="saveBrewLog('filter')">Save brew</button></div>
+      </div>
+      <div class="card" id="dialResult"><h2>Next brew change</h2><p class="muted">Rate the cup to get one focused adjustment.</p></div>
+    </div>
+  </section>
+
+  <section id="espresso" class="view">
+    <div class="grid g2">
+      <div class="card">
+        <h2>Espresso setup</h2>
+        <div class="fieldgrid">
+          <label>Bean<select id="espressoBean"></select></label>
+          <label>Machine<select id="espressoBrewer"></select></label>
+          <label>Grinder<select id="espressoGrinder"></select></label>
+          <label>Grind<input id="espressoGrind"/></label>
+          <label>Dose (g)<input id="espressoDose" type="number" step=".1" value="18"/></label>
+          <label>Yield (g)<input id="espressoYield" type="number" step=".1" value="36"/></label>
+          <label>Temperature °C<input id="espressoTemp" type="number" value="93"/></label>
+          <label>Target time (s)<input id="espressoTimeTarget" type="number" value="30"/></label>
+        </div>
+        <div class="row" style="margin-top:14px"><button class="btn primary" onclick="recommendEspresso()">Recommend</button><button class="btn ghost" onclick="saveRecipeFromEspresso()">Save recipe</button></div>
+        <div class="notice" id="espressoWhy" style="margin-top:14px"></div>
+      </div>
+      <div class="card">
+        <div class="row space"><h2>Manual lever profile</h2><span class="pill">Flair-ready</span></div>
+        <canvas id="pressureChart" width="700" height="260"></canvas>
+        <div class="fieldgrid" style="margin-top:12px">
+          <label>Pre-infusion bar<input id="piBar" type="number" value="2"/></label>
+          <label>Pre-infusion sec<input id="piSec" type="number" value="8"/></label>
+          <label>Peak bar<input id="peakBar" type="number" value="8"/></label>
+          <label>Decline to bar<input id="declineBar" type="number" value="5"/></label>
+        </div>
+        <button class="btn small ghost" style="margin-top:12px" onclick="drawPressure()">Update graph</button>
+      </div>
+    </div>
+    <div class="card timer-wrap" style="margin-top:16px">
+      <div class="eyebrow">ESPRESSO TIMER</div>
+      <div class="timer" id="espressoTimer">00:00</div>
+      <div class="grid g3" style="max-width:720px;margin:18px auto 0">
+        <div><div class="eyebrow">Pressure</div><div class="bigval" id="livePressure">0 bar</div></div>
+        <div><div class="eyebrow">Yield</div><div class="bigval" id="liveYield">0 g</div></div>
+        <div><div class="eyebrow">Ratio</div><div class="bigval" id="liveRatio">1:0.00</div></div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:20px">
+        <button class="btn dark" onclick="timerStart('espresso')">START</button>
+        <button class="btn ghost" onclick="timerPause()">PAUSE</button>
+        <button class="btn line" onclick="timerReset()">RESET</button>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card"><h2>Espresso diagnosis</h2><div class="taste-grid" id="espressoTasteGrid"></div>
+        <div class="fieldgrid" style="margin-top:14px"><label>Actual time (s)<input id="espressoActualTime" type="number" value="30"/></label><label>Actual yield (g)<input id="espressoActualYield" type="number" value="36"/></label></div>
+        <button class="btn primary" style="margin-top:14px" onclick="diagnoseEspresso()">Diagnose</button>
+      </div>
+      <div class="card" id="espressoResult"><h2>Next shot change</h2><p class="muted">Choose taste descriptors and enter shot time.</p></div>
+    </div>
+  </section>
+
+  <section id="beans" class="view">
+    <div class="row space"><div><h2>Beans</h2><p>Track roast age, resting status and the best brew for each coffee.</p></div><button class="btn primary" onclick="showBeanForm()">+ Add bean</button></div>
+    <div id="beanForm" class="card" style="display:none;margin-bottom:16px">
+      <h3>New bean</h3>
+      <div class="fieldgrid">
+        <label>Bean name<input id="bName"/></label><label>Roaster<input id="bRoaster"/></label><label>Country<input id="bCountry"/></label><label>Region<input id="bRegion"/></label>
+        <label>Producer<input id="bProducer"/></label><label>Variety<input id="bVariety"/></label><label>Process<select id="bProcess"><option>Washed</option><option>Natural</option><option>Honey</option><option>Anaerobic</option><option>Carbonic Maceration</option><option>Experimental</option><option>Other</option></select></label>
+        <label>Roast level<select id="bRoast"><option>Very Light</option><option selected>Light</option><option>Medium-Light</option><option>Medium</option><option>Medium-Dark</option><option>Dark</option></select></label>
+        <label>Roast date<input id="bDate" type="date"/></label><label>Altitude<input id="bAltitude" placeholder="1900–2100 masl"/></label><label>Density<select id="bDensity"><option>Low</option><option selected>Medium</option><option>High</option></select></label><label>Rest best after (days)<input id="bRest" type="number" value="10"/></label>
+        <label style="grid-column:1/-1">Tasting notes<input id="bNotes"/></label>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="btn primary" onclick="saveBean()">Save bean</button><button class="btn ghost" onclick="hideBeanForm()">Cancel</button></div>
+    </div>
+    <div class="grid g3" id="beanCards"></div>
+  </section>
+
+  <section id="recipes" class="view">
+    <div class="row space"><div><h2>Recipes</h2><p>Saved starting points and repeatable best brews.</p></div><button class="btn ghost" onclick="exportRecipeText()">Export selected as text</button></div>
+    <div class="grid g3" id="recipeCards"></div>
+  </section>
+
+  <section id="logs" class="view">
+    <h2>Brew log</h2><div class="card" style="overflow:auto"><table class="table"><thead><tr><th>Date</th><th>Bean</th><th>Method</th><th>Grinder</th><th>Grind</th><th>Temp</th><th>Time</th><th>Rating</th></tr></thead><tbody id="logBody"></tbody></table></div>
+    <div class="grid g2" style="margin-top:16px"><div class="card"><h3>Consistency</h3><div id="consistency"></div></div><div class="card"><h3>Best recipe signal</h3><div id="bestSignal"></div></div></div>
+  </section>
+
+  <section id="grinders" class="view">
+    <div class="row space"><div><h2>Grinder database</h2><p>Ranges are references, not absolute rules. Personal calibration wins.</p></div><button class="btn primary" onclick="addCustomGrinder()">+ Custom grinder</button></div>
+    <div class="grid g3" id="grinderCards"></div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card"><h2>Grinder conversion</h2><div class="notice">Approximate comparable particle-size range only. Not guaranteed equivalent extraction.</div>
+        <div class="fieldgrid" style="margin-top:12px"><label>From<select id="convFrom"></select></label><label>Setting<input id="convValue" value="23"/></label><label>To<select id="convTo"></select></label><label>Result<input id="convResult" readonly/></label></div>
+        <div class="row" style="margin-top:14px"><button class="btn primary" onclick="convertGrind()">Convert</button><button class="btn ghost" onclick="saveCalibration()">Save as my mapping</button></div>
+      </div>
+      <div class="card"><h2>Personal calibration</h2><div id="calibrationList"></div></div>
+    </div>
+  </section>
+
+  <section id="dialin" class="view">
+    <div class="grid g2"><div class="card"><h2>Extraction map</h2><p>Strength is concentration. Extraction is how much soluble material was removed from the grounds.</p>
+      <div class="canvasbox"><div class="map-axis h"></div><div class="map-axis v"></div><div class="axislabel left">Under-extracted</div><div class="axislabel right">Over-extracted</div><div class="axislabel top">Weak</div><div class="axislabel bottom">Strong</div><div class="dot" id="mapDot" style="left:50%;top:50%"></div></div>
+      <div class="row" style="margin-top:12px"><button class="btn small ghost" onclick="plotMap('sour watery')">Sour + watery</button><button class="btn small ghost" onclick="plotMap('balanced')">Balanced</button><button class="btn small ghost" onclick="plotMap('bitter dry')">Bitter + dry</button><button class="btn small ghost" onclick="plotMap('strong sour')">Strong + sour</button></div>
+    </div>
+    <div class="card"><h2>Advanced extraction yield</h2><div class="notice">For refractometer users. This is an advanced measurement, not a taste score.</div>
+      <div class="fieldgrid" style="margin-top:12px"><label>Dose g<input id="eyDose" type="number" value="15"/></label><label>Beverage mass g<input id="eyMass" type="number" value="210"/></label><label>TDS %<input id="eyTds" type="number" step=".01" value="1.35"/></label><label>Extraction yield<input id="eyResult" readonly/></label></div>
+      <button class="btn primary" style="margin-top:14px" onclick="calcEY()">Calculate EY</button>
+    </div></div>
+  </section>
+
+  <section id="compare" class="view">
+    <h2>Compare brews</h2><div class="card"><div class="fieldgrid"><label>Brew A<select id="compareA"></select></label><label>Brew B<select id="compareB"></select></label></div><button class="btn primary" style="margin-top:14px" onclick="renderCompare()">Compare</button></div>
+    <div id="compareResult" style="margin-top:16px"></div>
+  </section>
+
+  <section id="settings" class="view">
+    <div class="grid g2">
+      <div class="card"><h2>Data</h2><p>Your data stays in this browser unless you export it.</p><div class="row"><button class="btn primary" onclick="exportData()">Export all data</button><label class="btn ghost" style="display:inline-flex;align-items:center">Import data<input type="file" id="importFile" accept="application/json" style="display:none" onchange="importData(event)"/></label></div></div>
+      <div class="card"><h2>Preferences</h2><label>Preferred K-Ultra display<select id="kDisplay" onchange="saveSettings()"><option value="dial">Dial notation (e.g. 2.5.0)</option><option value="clicks">Clicks</option></select></label><label style="margin-top:12px">Haptic cues<select id="hapticSetting" onchange="saveSettings()"><option value="on">On when supported</option><option value="off">Off</option></select></label></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h2>Architecture ready for future sensors</h2><p>Data entities are separated for beans, brewers, grinders, recipes, brews, taste profiles, calibration and water profiles. Bluetooth scale, flow telemetry, pressure sensors, refractometer integration, cloud sync and QR sharing can be added later without changing the basic brew workflow.</p></div>
+  </section>
+</main>
+</div>
+
+<nav class="bottom-nav" id="bottomNav"></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+const TODAY = new Date();
+const LS_KEY='brewlab_manual_coffee_v1';
+const navItems=[['home','Brew Now'],['brew','Brew'],['espresso','Espresso'],['beans','Beans'],['recipes','Recipes'],['logs','Brew Log'],['grinders','Grinders'],['dialin','Dial-In'],['compare','Compare'],['settings','Settings']];
+const tastes=['Sour','Sharp acidity','Bitter','Dry','Astringent','Hollow','Weak','Watery','Strong','Heavy','Muted','Flat','Sweet','Balanced','Clean','Juicy','Floral','Fruity'];
+const espressoTastes=['Sour','Bitter','Dry','Thin','Heavy','Sweet','Balanced','Channeling'];
+const defaultData={
+ beans:[
+  {id:'b1',name:'Ethiopia Guji Buku',roaster:'Demo Roastery',country:'Ethiopia',region:'Guji',producer:'Smallholders',variety:'Heirloom',process:'Washed',roast:'Light',roastDate:'2026-09-10',altitude:'2000–2200 masl',density:'High',rest:10,notes:'Jasmine, bergamot, peach',archived:false},
+  {id:'b2',name:'Colombia Huila Pink Bourbon',roaster:'North Star Coffee',country:'Colombia',region:'Huila',producer:'La Esperanza',variety:'Pink Bourbon',process:'Honey',roast:'Medium-Light',roastDate:'2026-09-15',altitude:'1800 masl',density:'High',rest:8,notes:'Red apple, panela, floral',archived:false},
+  {id:'b3',name:'Brazil Fazenda Serra',roaster:'Daily Roast',country:'Brazil',region:'Minas Gerais',producer:'Fazenda Serra',variety:'Yellow Bourbon',process:'Natural',roast:'Medium',roastDate:'2026-09-20',altitude:'1200 masl',density:'Medium',rest:7,notes:'Chocolate, hazelnut, cherry',archived:false}
+ ],
+ brewers:[
+  {id:'v60',name:'V60',type:'filter'},{id:'origami',name:'Origami',type:'filter'},{id:'orea',name:'Orea',type:'filter'},{id:'baby',name:'Orea Baby O',type:'filter'},
+  {id:'lili',name:'Lili Dripper',type:'filter'},{id:'kalita',name:'Kalita Wave',type:'filter'},{id:'aero',name:'AeroPress',type:'immersion'},{id:'clever',name:'Clever Dripper',type:'immersion'},
+  {id:'flair',name:'Flair Pro 2',type:'espresso'},{id:'lever',name:'Manual Lever',type:'espresso'},{id:'semi',name:'Semi-Automatic Espresso',type:'espresso'},{id:'custom',name:'Custom Brewer',type:'filter'}
+ ],
+ grinders:[
+  {id:'c40',name:'Comandante C40',manual:true,burr:'conical steel',burrSize:'39 mm',zero:'0',format:'clicks',ranges:{Espresso:'6–15',AeroPress:'15–22','Pour-over':'18–28','French Press':'25–35'},normalV60:'23'},
+  {id:'casa',name:'Option-O Lagom Casa',manual:false,burr:'conical',burrSize:'65 mm',zero:'user calibrated',format:'dial',ranges:{Espresso:'4–10',AeroPress:'10–16','Pour-over':'12–20','French Press':'18–24'},normalV60:'16'},
+  {id:'kultra',name:'1Zpresso K-Ultra',manual:true,burr:'conical',burrSize:'48 mm',zero:'0',format:'dial notation',ranges:{Espresso:'1.0.0–2.0.0',AeroPress:'4.5.0–6.0.0','Pour-over':'6.0.0–8.0.0','French Press':'8.0.0+'},normalV60:'6.5.0'}
+ ],
+ recipes:[
+  {id:'r1',name:'Orea Baby O Daily',bean:'b1',brewer:'baby',grinder:'casa',grind:'16',dose:15,ratio:16,temp:94,time:'2:40',stages:[['Bloom',0,45,50],['Pour 2',45,70,120],['Pour 3',90,110,180],['Final',120,145,240]]},
+  {id:'r2',name:'V60 Bright & Clean',bean:'b1',brewer:'v60',grinder:'c40',grind:'23',dose:15,ratio:16.5,temp:94,time:'2:45',stages:[['Bloom',0,45,50],['Pour',45,90,150],['Final',100,150,248]]},
+  {id:'r3',name:'Lili Sweet Cup',bean:'b2',brewer:'lili',grinder:'casa',grind:'16.5',dose:15,ratio:16,temp:93,time:'2:50',stages:[['Bloom',0,45,50],['Pour 1',45,80,130],['Pour 2',95,130,200],['Final',140,170,240]]},
+  {id:'r4',name:'Origami Floral',bean:'b2',brewer:'origami',grinder:'kultra',grind:'6.5.0',dose:15,ratio:16.5,temp:94,time:'2:35',stages:[['Bloom',0,40,45],['Continuous',40,125,248]]},
+  {id:'r5',name:'Flair Pro 2 Light Roast',bean:'b1',brewer:'flair',grinder:'c40',grind:'10',dose:18,ratio:2,temp:93,time:'30',espresso:true}
+ ],
+ brews:[
+  {id:'l1',date:'2026-09-20',bean:'b1',brewer:'baby',grinder:'casa',grind:'17',dose:15,water:240,ratio:16,temp:93,time:'2:18',rating:3,taste:['Sour','Weak'],notes:'Thin'},
+  {id:'l2',date:'2026-09-22',bean:'b1',brewer:'baby',grinder:'casa',grind:'16.5',dose:15,water:240,ratio:16,temp:94,time:'2:31',rating:4,taste:['Floral','Clean'],notes:'Better'},
+  {id:'l3',date:'2026-09-24',bean:'b1',brewer:'baby',grinder:'casa',grind:'16',dose:15,water:240,ratio:16,temp:94,time:'2:42',rating:5,taste:['Sweet','Balanced','Floral'],notes:'Best so far'},
+  {id:'l4',date:'2026-09-25',bean:'b2',brewer:'lili',grinder:'c40',grind:'24',dose:15,water:240,ratio:16,temp:93,time:'2:28',rating:4,taste:['Juicy','Fruity'],notes:'Nice acidity'},
+  {id:'l5',date:'2026-09-26',bean:'b3',brewer:'v60',grinder:'kultra',grind:'7.0.0',dose:15,water:225,ratio:15,temp:91,time:'2:36',rating:4,taste:['Sweet','Heavy'],notes:'Chocolate-forward'}
+ ],
+ calibrations:[],
+ waterProfiles:[{id:'w1',name:'Soft filter',tds:80,gh:60,kh:35,ph:7.2}],
+ settings:{advanced:false,kDisplay:'dial',haptics:'on'}
+};
+let data=loadData(), stages=[], timerInt=null, elapsed=0, timerMode='filter', selectedTastes=new Set(), selectedEspressoTastes=new Set();
+
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function loadData(){try{const s=localStorage.getItem(LS_KEY);return s?JSON.parse(s):clone(defaultData)}catch(e){return clone(defaultData)}}
+function saveData(){localStorage.setItem(LS_KEY,JSON.stringify(data))}
+function byId(arr,id){return arr.find(x=>x.id===id)}
+function fmtAge(date){return Math.max(0,Math.floor((TODAY-new Date(date+'T00:00:00'))/86400000))}
+function beanStatus(b){const a=fmtAge(b.roastDate),r=+b.rest||10;if(a<Math.max(3,r-4))return ['TOO FRESH','fresh'];if(a<=35)return ['READY','ready'];if(a<=60)return ['MATURE','ready'];return ['OLD','old']}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function safe(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function mmss(sec){sec=Math.max(0,Math.floor(sec));return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
+function parseTime(s){if(typeof s==='number')return s;let p=String(s||'0').split(':').map(Number);return p.length===2?p[0]*60+p[1]:+s||0}
+
+function initNav(){
+ sideNav.innerHTML=navItems.map(([id,n])=>`<button data-view="${id}" onclick="showView('${id}')">${n}</button>`).join('');
+ bottomNav.innerHTML=[['home','Brew'],['espresso','Espresso'],['beans','Beans'],['logs','Log'],['grinders','Gear']].map(([id,n])=>`<button data-view="${id}" onclick="showView('${id}')">${n}</button>`).join('');
+ showView('home');
+}
+function showView(id){
+ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+ document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
+ const names={home:['Personal coffee lab','Brew Now'],brew:['Filter coffee','Brew'],espresso:['Manual espresso','Espresso'],beans:['Coffee inventory','Beans'],recipes:['Reusable starting points','Recipes'],logs:['Learning from every cup','Brew Log'],grinders:['Personal references','Grinder Database'],dialin:['One change at a time','Dial-In Assistant'],compare:['A/B learning','Compare'],settings:['Local-first','Settings']};
+ sectionEyebrow.textContent=names[id][0];sectionTitle.textContent=names[id][1]; if(document.getElementById('sectionSubtitle')) sectionSubtitle.textContent=id==='home'?'Track, improve, and enjoy better coffee.':'Manual coffee extraction, without the clutter.';
+ if(id==='beans')renderBeans();if(id==='recipes')renderRecipes();if(id==='logs')renderLogs();if(id==='grinders')renderGrinders();if(id==='compare')fillCompare();
+}
+function fillSelect(id,arr,filter){
+ const el=document.getElementById(id);if(!el)return;const list=filter?arr.filter(filter):arr;el.innerHTML=list.map(x=>`<option value="${x.id}">${safe(x.name)}</option>`).join('')
+}
+function populate(){
+ ['quickBean','brewBean','espressoBean'].forEach(id=>fillSelect(id,data.beans,b=>!b.archived));
+ fillSelect('quickBrewer',data.brewers,b=>b.type!=='espresso');fillSelect('brewBrewer',data.brewers,b=>b.type!=='espresso');fillSelect('espressoBrewer',data.brewers,b=>b.type==='espresso');
+ ['quickGrinder','brewGrinder','espressoGrinder','convFrom','convTo'].forEach(id=>fillSelect(id,data.grinders));
+ kDisplay.value=data.settings.kDisplay||'dial';hapticSetting.value=data.settings.haptics||'on';
+ renderHome();renderStageEditor();renderTasteChips();drawPressure();
+}
+function renderHome(){
+ const active=data.beans.filter(b=>!b.archived), b=active[0];
+ const best=[...data.brews].sort((a,b)=>b.rating-a.rating)[0];
+ const last=data.brews[data.brews.length-1];
+
+ // Bean spotlight
+ if(b){
+   const s=beanStatus(b);
+   homeSummary.innerHTML=`
+     <div class="row space"><div class="eyebrow">TODAY'S BEAN</div><button class="btn small line" onclick="showView('beans')">View details →</button></div>
+     <h2>${safe(b.name)}</h2>
+     <p style="margin:0 0 8px">${safe(b.country)} · ${safe(b.process)}</p>
+     <div class="row" style="margin:10px 0"><span class="pill">◷ Roast age <b>${fmtAge(b.roastDate)} days</b></span><span class="pill status ${s[1]}">${s[0]}</span></div>
+     <div class="eyebrow" style="margin-top:14px">TASTING NOTES</div>
+     <p style="max-width:78%;margin:7px 0 10px">${safe(b.notes)}</p>
+     <div class="bean-tags">${String(b.notes||'').split(',').slice(0,4).map(x=>`<span>${safe(x.trim())}</span>`).join('')}</div>`;
+ }
+
+ // Chart from the latest 7 brews. Rating is used as a simple preference trend.
+ const chartSource=data.brews.slice(-7);
+ dashboardChart.innerHTML=chartSource.map((x,i)=>{
+   const h=42 + (x.rating||3)*18;
+   return `<div class="chart-bar-wrap"><div class="chart-bar ${i===chartSource.length-2?'hot':''}" style="height:${h}px" title="${safe(byId(data.beans,x.bean)?.name)} · ★${x.rating}"></div><div class="chart-label">${safe(x.date.slice(5))}</div></div>`;
+ }).join('');
+
+ // Best recipe / best brew signal
+ const bestBean=byId(data.beans,best.bean), bestBrewer=byId(data.brewers,best.brewer), bestGrinder=byId(data.grinders,best.grinder);
+ bestRecipeCard.innerHTML=`
+   <div class="row space"><div><div class="eyebrow">BEST RECIPE FOR THIS BEAN</div><h2 style="margin:4px 0 0">${safe(bestBrewer?.name||'Best Brew')}</h2></div><button class="btn small line" onclick="loadBrew(${JSON.stringify(best).replace(/"/g,'&quot;')})">Brew this recipe →</button></div>
+   <div class="recipe-card-inner" style="margin-top:12px">
+     <div class="recipe-thumb">☕</div>
+     <div>
+       <h3>${safe(bestBean?.name)}</h3>
+       <p style="margin:0">Your highest-rated saved brew.</p>
+       <div class="recipe-metrics">
+         <div class="metric-chip"><small>GRINDER</small><b>${safe(bestGrinder?.name)}</b></div>
+         <div class="metric-chip"><small>GRIND</small><b>${safe(best.grind)}</b></div>
+         <div class="metric-chip"><small>WATER TEMP</small><b>${best.temp}°C</b></div>
+         <div class="metric-chip"><small>COFFEE : WATER</small><b>1:${safe(best.ratio)}</b></div>
+       </div>
+     </div>
+   </div>`;
+
+ // Next change card
+ let action='Keep this recipe';
+ let desc='Your last brew was well-rated. Repeat it for consistency before changing a major variable.';
+ if(last && last.rating<=3){action='Grind 1 step finer';desc='Your previous cup scored lower. Try one focused grind adjustment while keeping everything else the same.'}
+ nextBrewCard.innerHTML=`
+   <div class="eyebrow">NEXT BREW CHANGE</div>
+   <h2 style="margin:5px 0 0">Based on your last brew</h2>
+   <div class="next-box"><div class="row"><div style="font-size:28px">◎</div><div><b>${safe(action)}</b><p style="margin:3px 0 0;font-size:11px">${safe(desc)}</p></div></div></div>
+   <button class="btn primary" onclick="loadBrew(${JSON.stringify(last).replace(/"/g,'&quot;')})">Adjust & Brew Again →</button>`;
+
+ dashboardLogBody.innerHTML=[...data.brews].reverse().slice(0,4).map(l=>`
+   <tr>
+    <td>${safe(l.date)}</td>
+    <td><b>${safe(byId(data.beans,l.bean)?.name)}</b><br><span class="muted">${safe(byId(data.beans,l.bean)?.process||'')}</span></td>
+    <td>${safe(byId(data.brewers,l.brewer)?.name)}</td>
+    <td>${safe(l.grind)}</td>
+    <td>${l.temp}°C</td>
+    <td>1:${safe(l.ratio)}</td>
+    <td class="stars">${'★'.repeat(l.rating)}${'☆'.repeat(5-l.rating)}</td>
+    <td>${safe(l.notes||'')}</td>
+   </tr>`).join('');
+}
+function prepareBrew(){
+ brewBean.value=quickBean.value;brewBrewer.value=quickBrewer.value;brewGrinder.value=quickGrinder.value;showView('brew');recommendFilter()
+}
+function quickStart(){prepareBrew();timerStart('filter')}
+function roastTemp(roast){return {'Very Light':96,'Light':94,'Medium-Light':93,'Medium':92,'Medium-Dark':89,'Dark':87}[roast]||93}
+function grindStart(grinder,roast,brewer){
+ let base=grinder.normalV60||'23';
+ if(grinder.id==='c40'){let n=parseFloat(base);if(['Very Light','Light'].includes(roast))n-=1;if(brewer==='baby')n-=1;return String(Math.round(n))}
+ if(grinder.id==='casa'){let n=parseFloat(base);if(['Very Light','Light'].includes(roast))n-=0.5;if(brewer==='baby')n-=0.5;return String(n)}
+ if(grinder.id==='kultra'){return ['Very Light','Light'].includes(roast)?'6.3.0':'6.5.0'}
+ return base
+}
+function recommendFilter(){
+ const b=byId(data.beans,brewBean.value),g=byId(data.grinders,brewGrinder.value),br=byId(data.brewers,brewBrewer.value);
+ const prior=data.brews.filter(x=>x.bean===b.id&&x.brewer===br.id&&x.grinder===g.id).sort((a,b)=>b.rating-a.rating)[0];
+ const temp=prior?.rating>=4?prior.temp:roastTemp(b.roast), ratio=prior?.rating>=4?prior.ratio:16, grind=prior?.rating>=4?prior.grind:grindStart(g,b.roast,br.id);
+ brewTemp.value=temp;brewRatio.value=ratio;brewGrind.value=grind;recalcWater();
+ const water=+brewWater.value;stages=[{name:'Bloom',start:0,end:45,target:Math.round(+brewDose.value*3)},{name:'Pour 2',start:45,end:75,target:Math.round(water*.5)},{name:'Pour 3',start:90,end:115,target:Math.round(water*.75)},{name:'Final',start:125,end:160,target:water}];
+ renderStageEditor();
+ recommendWhy.innerHTML=prior?.rating>=4?`<b>Using your previous best as the starting point.</b> ${safe(prior.grind)} on ${safe(g.name)}, ${prior.temp}°C, 1:${prior.ratio}.`: `<b>Why:</b> ${b.roast} roast starts around ${temp}°C. ${b.process} process is treated as a tendency only. Grind is anchored to your ${safe(g.name)} V60 reference (${safe(g.normalV60)}) and adjusted for ${safe(br.name)}.`;
+}
+function recalcWater(){brewWater.value=Math.round((+brewDose.value||15)*(+brewRatio.value||16))}
+function renderStageEditor(){
+ if(!stages.length) stages=[{name:'Bloom',start:0,end:45,target:45},{name:'Pour 2',start:45,end:75,target:120},{name:'Pour 3',start:90,end:110,target:180},{name:'Final',start:120,end:155,target:240}];
+ stageEditor.innerHTML=stages.map((s,i)=>`<div class="stage"><input value="${safe(s.name)}" onchange="stages[${i}].name=this.value"><input type="number" value="${s.start}" onchange="stages[${i}].start=+this.value" title="start sec"><input type="number" value="${s.target}" onchange="stages[${i}].target=+this.value" title="target g"></div>`).join('');
+ const f=stages.length>1?(stages[1].target-stages[0].target)/Math.max(1,stages[1].end-stages[1].start):0;flowRateInfo.textContent=`Approx. stage flow reference: ${f.toFixed(1)} g/s. Use this as a technique cue, not a strict rule.`;
+}
+function addStage(){stages.push({name:'Pour '+(stages.length+1),start:(stages.at(-1)?.start||0)+30,end:(stages.at(-1)?.start||0)+50,target:(stages.at(-1)?.target||0)+50});renderStageEditor()}
+function renderTasteChips(){
+ tasteGrid.innerHTML=tastes.map(t=>`<button class="taste" onclick="toggleTaste(this,'${t.replace(/'/g,"\\'")}')">${t}</button>`).join('');
+ espressoTasteGrid.innerHTML=espressoTastes.map(t=>`<button class="taste" onclick="toggleEspressoTaste(this,'${t.replace(/'/g,"\\'")}')">${t}</button>`).join('')
+}
+function toggleTaste(el,t){selectedTastes.has(t)?selectedTastes.delete(t):selectedTastes.add(t);el.classList.toggle('selected')}
+function toggleEspressoTaste(el,t){selectedEspressoTastes.has(t)?selectedEspressoTastes.delete(t):selectedEspressoTastes.add(t);el.classList.toggle('selected')}
+function timerStart(mode){timerMode=mode;if(timerInt)return;const started=Date.now()-elapsed*1000;timerInt=setInterval(()=>{elapsed=(Date.now()-started)/1000;renderTimer()},200)}
+function timerPause(){clearInterval(timerInt);timerInt=null}
+function timerReset(){timerPause();elapsed=0;renderTimer()}
+function haptic(){if(data.settings.haptics!=='off'&&navigator.vibrate)navigator.vibrate(60)}
+function renderTimer(){
+ if(timerMode==='espresso'){
+   espressoTimer.textContent=mmss(elapsed);const pi=+piSec.value||8,pk=+peakBar.value||8,db=+declineBar.value||5;
+   let p=elapsed<pi?2:elapsed<pi+4?2+(pk-2)*(elapsed-pi)/4:Math.max(db,pk-(elapsed-pi-4)*.12);
+   const target=+espressoYield.value||36, total=+espressoTimeTarget.value||30, y=Math.min(target,target*elapsed/total);
+   livePressure.textContent=p.toFixed(1)+' bar';liveYield.textContent=y.toFixed(1)+' g';liveRatio.textContent='1:'+(y/(+espressoDose.value||18)).toFixed(2);
+ } else {
+   brewTimer.textContent=mmss(elapsed);let idx=stages.findIndex((s,i)=>elapsed>=s.start&&(i===stages.length-1||elapsed<stages[i+1].start));if(idx<0)idx=0;
+   const s=stages[idx];stageName.textContent=s.name;stageTarget.textContent='Target '+s.target+' g';nextAction.textContent=idx<stages.length-1?`Next: ${stages[idx+1].name} at ${mmss(stages[idx+1].start)}`:'Finish and let the drawdown complete.';
+   document.querySelectorAll('#stageEditor .stage').forEach((x,i)=>x.classList.toggle('active',i===idx));
+ }
+}
+function finishBrew(){timerPause();actualTime.value=mmss(elapsed);document.getElementById('tasteGrid').scrollIntoView({behavior:'smooth'})}
+function grinderStep(g,dir,val){
+ if(g.id==='c40')return String(Math.max(1,Math.round((+val||23)+dir)));
+ if(g.id==='casa')return String(Math.max(0,(+val||16)+dir*.5));
+ if(g.id==='kultra'){let m=String(val).match(/(\d+)\.(\d+)\.(\d+)/);let x=m?(+m[1]*100+ +m[2]*10+ +m[3]):650;x+=dir*10;return `${Math.floor(x/100)}.${Math.floor((x%100)/10)}.${x%10}`}
+ return String((+val||0)+dir)
+}
+function diagnoseFilter(){
+ const ts=[...selectedTastes],g=byId(data.grinders,brewGrinder.value),actual=parseTime(actualTime.value),target=160;
+ let direction=0,reason='',action='Keep recipe';
+ if((ts.includes('Sour')||ts.includes('Sharp acidity')||ts.includes('Weak')||ts.includes('Watery'))&&actual<target){direction=-1;reason='The brew is fast and reads sour/thin, which often points to insufficient extraction.'}
+ else if((ts.includes('Bitter')||ts.includes('Dry')||ts.includes('Astringent'))&&actual>target){direction=1;reason='The brew is slow and reads bitter/dry, which often points to excessive extraction or contact time.'}
+ else if(ts.includes('Sour')||ts.includes('Sharp acidity')){reason='Brew time is not obviously fast, so keep grind stable and raise temperature by 1°C.';action=`Temperature ${brewTemp.value} → ${+brewTemp.value+1}°C`}
+ else if(ts.includes('Bitter')||ts.includes('Dry')){reason='Brew time is not obviously slow, so keep grind stable and lower temperature by 1°C.';action=`Temperature ${brewTemp.value} → ${+brewTemp.value-1}°C`}
+ else if(ts.includes('Balanced')||ts.includes('Sweet')){reason='The cup is already balanced. Preserve the recipe and test only a small variable if you want to explore.';action='Keep recipe unchanged'}
+ if(direction){const next=grinderStep(g,direction,brewGrind.value);action=`GRIND ${direction<0?'FINER':'COARSER'} — ${brewGrind.value} → ${next}`}
+ dialResult.innerHTML=`<div class="eyebrow">NEXT BREW CHANGE</div><h2 class="next-change">${safe(action)}</h2><p><b>Why:</b> ${safe(reason||'Taste feedback does not clearly indicate a large correction, so avoid changing multiple variables.')}</p><div class="notice">Change only this major variable on the next brew. Expected result: move the cup toward better balance without losing the learning signal.</div>`;
+ plotMap(ts.join(' ').toLowerCase())
+}
+function saveBrewLog(type){
+ const isE=type==='espresso', rec={id:'l'+Date.now(),date:new Date().toISOString().slice(0,10),bean:isE?espressoBean.value:brewBean.value,brewer:isE?espressoBrewer.value:brewBrewer.value,grinder:isE?espressoGrinder.value:brewGrinder.value,grind:isE?espressoGrind.value:brewGrind.value,dose:isE?+espressoDose.value:+brewDose.value,water:isE?+espressoActualYield.value:+brewWater.value,ratio:isE?(+espressoActualYield.value/+espressoDose.value).toFixed(2):+brewRatio.value,temp:isE?+espressoTemp.value:+brewTemp.value,time:isE?String(+espressoActualTime.value):actualTime.value,rating:+brewRating.value||4,taste:isE?[...selectedEspressoTastes]:[...selectedTastes],notes:brewNotes.value||'',espresso:isE};
+ data.brews.push(rec);saveData();toast('Brew saved');renderHome()
+}
+function showBeanForm(){beanForm.style.display='block';bDate.value=new Date().toISOString().slice(0,10)}
+function hideBeanForm(){beanForm.style.display='none'}
+function saveBean(){
+ const bean={id:'b'+Date.now(),name:bName.value||'Untitled coffee',roaster:bRoaster.value,country:bCountry.value,region:bRegion.value,producer:bProducer.value,variety:bVariety.value,process:bProcess.value,roast:bRoast.value,roastDate:bDate.value||new Date().toISOString().slice(0,10),altitude:bAltitude.value,density:bDensity.value,rest:+bRest.value||10,notes:bNotes.value,archived:false};
+ data.beans.push(bean);saveData();hideBeanForm();populate();renderBeans();toast('Bean saved')
+}
+function renderBeans(){
+ beanCards.innerHTML=data.beans.filter(b=>!b.archived).map(b=>{const s=beanStatus(b),best=data.brews.filter(x=>x.bean===b.id).sort((a,b)=>b.rating-a.rating)[0];return `<div class="card bean-card"><div class="eyebrow">${safe(b.roaster||b.country)}</div><div class="bean-title">${safe(b.name)}</div><div><span class="pill">${safe(b.process)}</span> <span class="pill">${safe(b.roast)}</span></div><div class="stat"><div class="bigval">${fmtAge(b.roastDate)} days</div><div class="status ${s[1]}">${s[0]}</div></div><p>${safe(b.notes)}</p>${best?`<div class="notice"><b>Best brew</b><br>${safe(byId(data.brewers,best.brewer)?.name)} · ${safe(byId(data.grinders,best.grinder)?.name)} ${safe(best.grind)} · ${best.temp}°C · ★${best.rating}</div>`:''}<div class="row"><button class="btn small ghost" onclick="brewBean.value='${b.id}';quickBean.value='${b.id}';showView('brew');recommendFilter()">Brew this</button><button class="btn small line" onclick="archiveBean('${b.id}')">Archive</button></div></div>`}).join('')
+}
+function archiveBean(id){byId(data.beans,id).archived=true;saveData();populate();renderBeans()}
+function currentStageTuple(){return stages.map(s=>[s.name,s.start,s.end,s.target])}
+function saveRecipeFromBrew(){
+ data.recipes.push({id:'r'+Date.now(),name:(byId(data.brewers,brewBrewer.value)?.name||'Filter')+' '+new Date().toLocaleDateString(),bean:brewBean.value,brewer:brewBrewer.value,grinder:brewGrinder.value,grind:brewGrind.value,dose:+brewDose.value,ratio:+brewRatio.value,temp:+brewTemp.value,time:mmss(stages.at(-1)?.end||160),stages:currentStageTuple()});saveData();toast('Recipe saved')
+}
+function saveRecipeFromEspresso(){
+ data.recipes.push({id:'r'+Date.now(),name:'Flair / Espresso '+new Date().toLocaleDateString(),bean:espressoBean.value,brewer:espressoBrewer.value,grinder:espressoGrinder.value,grind:espressoGrind.value,dose:+espressoDose.value,ratio:+espressoYield.value/+espressoDose.value,temp:+espressoTemp.value,time:String(espressoTimeTarget.value),espresso:true});saveData();toast('Espresso recipe saved')
+}
+function renderRecipes(){
+ recipeCards.innerHTML=data.recipes.map(r=>`<div class="card"><div class="eyebrow">${r.espresso?'ESPRESSO':'FILTER'}</div><h3>${safe(r.name)}</h3><p>${safe(byId(data.beans,r.bean)?.name)}<br>${safe(byId(data.brewers,r.brewer)?.name)} · ${safe(byId(data.grinders,r.grinder)?.name)} ${safe(r.grind)}</p><div class="row"><span class="pill">${r.temp}°C</span><span class="pill">1:${safe(r.ratio)}</span><span class="pill">${safe(r.time)}</span></div><div class="row" style="margin-top:14px"><button class="btn small primary" onclick="loadRecipe('${r.id}')">Brew again</button><button class="btn small ghost" onclick="cloneRecipe('${r.id}')">Clone</button></div></div>`).join('')
+}
+function loadRecipe(id){
+ const r=byId(data.recipes,id);if(r.espresso){showView('espresso');espressoBean.value=r.bean;espressoBrewer.value=r.brewer;espressoGrinder.value=r.grinder;espressoGrind.value=r.grind;espressoDose.value=r.dose;espressoYield.value=Math.round(r.dose*r.ratio);espressoTemp.value=r.temp}
+ else{showView('brew');brewBean.value=r.bean;brewBrewer.value=r.brewer;brewGrinder.value=r.grinder;brewGrind.value=r.grind;brewDose.value=r.dose;brewRatio.value=r.ratio;brewTemp.value=r.temp;recalcWater();if(r.stages){stages=r.stages.map(x=>({name:x[0],start:x[1],end:x[2],target:x[3]}));renderStageEditor()}}
+}
+function cloneRecipe(id){const r=clone(byId(data.recipes,id));r.id='r'+Date.now();r.name+=' Copy';data.recipes.push(r);saveData();renderRecipes();toast('Recipe cloned')}
+function exportRecipeText(){
+ const r=data.recipes[0];if(!r)return;const bean=byId(data.beans,r.bean),br=byId(data.brewers,r.brewer),g=byId(data.grinders,r.grinder);
+ let txt=`${bean.name.toUpperCase()}\n\n${br.name}\n${r.dose} g coffee\n${Math.round(r.dose*r.ratio)} g water\n${r.temp}°C\n${g.name} ${r.grind}\n\n`;
+ if(r.stages)r.stages.forEach(s=>txt+=`${s[0]}\n${s[3]} g / ${mmss(s[1])}\n\n`);txt+=`Total: ${r.time}`;
+ navigator.clipboard?.writeText(txt);toast('Recipe copied as text')
+}
+function renderLogs(){
+ logBody.innerHTML=[...data.brews].reverse().map(l=>`<tr><td>${l.date}</td><td>${safe(byId(data.beans,l.bean)?.name)}</td><td>${safe(byId(data.brewers,l.brewer)?.name)}</td><td>${safe(byId(data.grinders,l.grinder)?.name)}</td><td>${safe(l.grind)}</td><td>${l.temp}°</td><td>${safe(l.time)}</td><td class="stars">${'★'.repeat(l.rating)}</td></tr>`).join('');
+ const last5=data.brews.slice(-5).map(x=>parseTime(x.time)).filter(x=>x>0), avg=last5.reduce((a,b)=>a+b,0)/(last5.length||1), spread=Math.max(...last5,0)-Math.min(...last5,0);
+ consistency.innerHTML=`<div class="bigval">${spread<=10?'HIGH':spread<=20?'MEDIUM':'LOW'}</div><p>Last brew times: ${last5.map(mmss).join(' · ')}<br>Average ${mmss(avg)} · spread ${spread.toFixed(0)} sec.</p>`;
+ const best=[...data.brews].sort((a,b)=>b.rating-a.rating)[0];bestSignal.innerHTML=`<div class="bigval">${safe(best.grind)}</div><p>${safe(byId(data.beans,best.bean)?.name)} · ${safe(byId(data.grinders,best.grinder)?.name)} · ${best.temp}°C · ${best.time}</p>`
+}
+function renderGrinders(){
+ grinderCards.innerHTML=data.grinders.map(g=>`<div class="card"><div class="eyebrow">${g.manual?'MANUAL':'ELECTRIC'}</div><h3>${safe(g.name)}</h3><p>${safe(g.burrSize)} · ${safe(g.burr)}</p>${Object.entries(g.ranges||{}).map(([k,v])=>`<div class="row space stat"><span>${k}</span><b>${safe(v)}</b></div>`).join('')}<label style="margin-top:12px">My normal V60 setting<input value="${safe(g.normalV60||'')}" onchange="setNormalV60('${g.id}',this.value)"/></label></div>`).join('');
+ calibrationList.innerHTML=data.calibrations.length?data.calibrations.map(c=>`<div class="stat">${safe(byId(data.grinders,c.from)?.name)} ${safe(c.fromValue)} ≈ ${safe(byId(data.grinders,c.to)?.name)} ${safe(c.toValue)}</div>`).join(''):'<p class="muted">No personal mappings yet.</p>'
+}
+function setNormalV60(id,v){byId(data.grinders,id).normalV60=v;saveData();toast('Personal V60 reference saved')}
+function addCustomGrinder(){
+ const name=prompt('Grinder name');if(!name)return;data.grinders.push({id:'g'+Date.now(),name,manual:true,burr:'custom',burrSize:'',zero:'user calibrated',format:'custom',ranges:{Espresso:'Edit','Pour-over':'Edit'},normalV60:''});saveData();populate();renderGrinders()
+}
+function convNumeric(id,v){
+ if(id==='c40')return +v;
+ if(id==='casa')return 8+(+v)*0.95;
+ if(id==='kultra'){let m=String(v).match(/(\d+)\.(\d+)\.(\d+)/);let x=m?(+m[1]*100+ +m[2]*10+ +m[3]):650;return 8+x/45}
+ return +v
+}
+function fromNumeric(id,n){
+ if(id==='c40')return Math.round(n);
+ if(id==='casa')return ((n-8)/.95).toFixed(1);
+ if(id==='kultra'){let x=Math.round((n-8)*45/10)*10;return `${Math.floor(x/100)}.${Math.floor((x%100)/10)}.${x%10}`}
+ return n.toFixed(1)
+}
+function convertGrind(){
+ const custom=data.calibrations.find(c=>c.from===convFrom.value&&c.to===convTo.value&&String(c.fromValue)===String(convValue.value));
+ convResult.value=custom?custom.toValue:fromNumeric(convTo.value,convNumeric(convFrom.value,convValue.value));toast(custom?'Used your personal calibration':'Approximate conversion only')
+}
+function saveCalibration(){if(!convResult.value)convertGrind();data.calibrations.push({id:'c'+Date.now(),from:convFrom.value,fromValue:convValue.value,to:convTo.value,toValue:convResult.value});saveData();renderGrinders();toast('Personal mapping saved')}
+function drawPressure(){
+ const c=pressureChart,ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);ctx.strokeStyle='#d6cec2';ctx.lineWidth=1;
+ for(let i=1;i<5;i++){ctx.beginPath();ctx.moveTo(0,h*i/5);ctx.lineTo(w,h*i/5);ctx.stroke()}
+ const pi=+piSec.value||8,pk=+peakBar.value||8,db=+declineBar.value||5;const pts=[[0,0],[2,2],[pi,2],[pi+4,pk],[pi+14,pk],[30,db]];
+ ctx.strokeStyle='#6c4a32';ctx.lineWidth=5;ctx.beginPath();pts.forEach((p,i)=>{const x=p[0]/32*w,y=h-p[1]/10*h;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+}
+function recommendEspresso(){
+ const b=byId(data.beans,espressoBean.value),g=byId(data.grinders,espressoGrinder.value);espressoTemp.value=roastTemp(b.roast)-1;
+ espressoGrind.value=g.id==='c40'?'10':g.id==='casa'?'7':'1.5.0';espressoYield.value=(+espressoDose.value*2).toFixed(0);espressoTimeTarget.value=30;
+ espressoWhy.innerHTML=`<b>Starting point:</b> 1:2 ratio, around 30 seconds, ${espressoTemp.value}°C. For ${b.roast} roast the app prioritizes grind first, then yield/ratio, then temperature.`;
+}
+function diagnoseEspresso(){
+ const t=[...selectedEspressoTastes],actual=+espressoActualTime.value,target=+espressoTimeTarget.value,g=byId(data.grinders,espressoGrinder.value);let action='',why='';
+ if((t.includes('Sour')||t.includes('Thin'))&&actual<target-3){action=`Grind finer: ${espressoGrind.value} → ${grinderStep(g,-1,espressoGrind.value)}`;why='Fast shot plus sour/thin taste often indicates insufficient extraction.'}
+ else if((t.includes('Bitter')||t.includes('Dry'))&&actual>target+3){action=`Grind coarser: ${espressoGrind.value} → ${grinderStep(g,1,espressoGrind.value)}`;why='Slow shot plus bitter/dry taste often indicates excessive extraction.'}
+ else if(t.includes('Sour')){action=`Temperature ${espressoTemp.value} → ${+espressoTemp.value+1}°C`;why='Shot time is close to target, so keep grind stable and increase extraction energy slightly.'}
+ else if(t.includes('Bitter')){action=`Temperature ${espressoTemp.value} → ${+espressoTemp.value-1}°C`;why='Shot time is close to target, so keep grind stable and reduce extraction energy slightly.'}
+ else if(t.includes('Channeling')){action='Keep recipe; improve puck preparation';why='Channeling is primarily a distribution and puck integrity problem, not a recipe-number problem.'}
+ else {action='Keep recipe unchanged';why='The feedback does not indicate a clear major correction.'}
+ espressoResult.innerHTML=`<div class="eyebrow">NEXT SHOT CHANGE</div><h2 class="next-change">${safe(action)}</h2><p><b>Why:</b> ${safe(why)}</p><details><summary>Puck-preparation checklist</summary><p>Dose consistency · Distribution · WDT · Level bed · Even tamp · Clean basket</p></details>`
+}
+function plotMap(text){
+ text=(text||'').toLowerCase();let x=50,y=50;if(text.includes('sour'))x=28;if(text.includes('bitter')||text.includes('dry'))x=75;if(text.includes('watery')||text.includes('weak'))y=30;if(text.includes('strong')||text.includes('heavy'))y=72;if(text.includes('balanced')){x=50;y=50}mapDot.style.left=x+'%';mapDot.style.top=y+'%'
+}
+function calcEY(){eyResult.value=(((+eyMass.value)*(+eyTds.value/100)/(+eyDose.value))*100).toFixed(2)+'%'}
+function fillCompare(){fillSelect('compareA',data.brews.map(x=>({...x,name:`${x.date} · ${byId(data.beans,x.bean)?.name} · ★${x.rating}`})));fillSelect('compareB',data.brews.map(x=>({...x,name:`${x.date} · ${byId(data.beans,x.bean)?.name} · ★${x.rating}`})));if(data.brews.length>1)compareB.selectedIndex=1}
+function renderCompare(){
+ const a=byId(data.brews,compareA.value),b=byId(data.brews,compareB.value);if(!a||!b)return;const diff=(k,v)=>String(a[k])!==String(b[k])?`<span class="diff">${safe(v)}</span>`:safe(v);
+ const card=x=>`<div class="card"><div class="eyebrow">${x===a?'BREW A':'BREW B'}</div><h3>${safe(byId(data.beans,x.bean)?.name)}</h3><p>${safe(byId(data.grinders,x.grinder)?.name)} · Grind ${x===a?diff('grind',x.grind):String(a.grind)!==String(b.grind)?`<span class="diff">${safe(x.grind)}</span>`:safe(x.grind)}<br>Temperature ${x===a?diff('temp',x.temp):a.temp!==b.temp?`<span class="diff">${x.temp}°C</span>`:x.temp+'°C'}<br>Ratio 1:${safe(x.ratio)}<br>Time ${x===a?diff('time',x.time):a.time!==b.time?`<span class="diff">${safe(x.time)}</span>`:safe(x.time)}</p><p><b>Taste:</b> ${(x.taste||[]).map(safe).join(', ')}</p><div class="stars">${'★'.repeat(x.rating)}</div></div>`;
+ compareResult.innerHTML=`<div class="compare">${card(a)}<div class="vs">VS</div>${card(b)}</div>`
+}
+function saveSettings(){data.settings.kDisplay=kDisplay.value;data.settings.haptics=hapticSetting.value;saveData()}
+function toggleAdvanced(){data.settings.advanced=!data.settings.advanced;modePill.textContent=data.settings.advanced?'ADVANCED':'BASIC';saveData();toast(data.settings.advanced?'Advanced mode on':'Basic mode on')}
+function exportData(){
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='brewlab-data.json';a.click();URL.revokeObjectURL(a.href)
+}
+function importData(e){
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);saveData();populate();toast('Data imported')}catch(err){alert('Invalid BREWLAB JSON')}};r.readAsText(f)
+}
+function loadBrew(l){showView('brew');brewBean.value=l.bean;brewBrewer.value=l.brewer;brewGrinder.value=l.grinder;brewGrind.value=l.grind;brewDose.value=l.dose;brewRatio.value=l.ratio;brewTemp.value=l.temp;recalcWater()}
+
+function globalSearchHandler(q){
+ q=String(q||'').trim().toLowerCase();
+ if(!q)return;
+ const bean=data.beans.find(x=>x.name.toLowerCase().includes(q)||String(x.roaster||'').toLowerCase().includes(q));
+ if(bean){quickBean.value=bean.id;brewBean.value=bean.id;renderHome();return}
+ const rec=data.recipes.find(x=>x.name.toLowerCase().includes(q));
+ if(rec){showView('recipes');return}
+}
+
+initNav();populate();modePill.textContent=data.settings.advanced?'ADVANCED':'BASIC';
+</script>
+</body>
+</html>
